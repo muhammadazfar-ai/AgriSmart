@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AgriSmart — زرعی مشیر</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--green:#1D9E75;--green-dark:#0F6E56;--green-light:#E1F5EE;--green-mid:#9FE1CB;--text:#1a1a1a;--muted:#666;--border:#c8e6d8;--bg:#f2faf6;--white:#fff;--red-bg:#FCEBEB;--red:#A32D2D}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+/* HEADER */
+.header{background:var(--green-dark);padding:1rem 1.5rem;color:white}
+.header-inner{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{font-size:30px}
+.logo-en{display:block;font-size:21px;font-weight:700;color:white;line-height:1.1}
+.logo-ur{display:block;font-family:'Noto Nastaliq Urdu',serif;font-size:13px;color:var(--green-mid);direction:rtl}
+.tagline{font-size:13px;color:var(--green-mid);font-style:italic}
+/* TABS */
+.tabs{background:var(--white);border-bottom:2px solid var(--green-light);display:flex;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:110px;padding:13px 6px;border:none;background:transparent;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:3px solid transparent;transition:all .2s}
+.tab:hover{background:var(--green-light);color:var(--green-dark)}
+.tab.active{color:var(--green-dark);border-bottom:3px solid var(--green);background:var(--green-light);font-weight:600}
+.tab-icon{font-size:17px}
+/* MAIN */
+.main{max-width:820px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.tab-content{display:none}
+.tab-content.active{display:block}
+/* SECTION HEADER */
+.sec-head{margin-bottom:1.4rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.sec-head h2{font-size:19px;font-weight:700;color:var(--green-dark);margin-bottom:3px}
+.sec-head p{font-size:13px;color:var(--muted)}
+.ur-inline{font-family:'Noto Nastaliq Urdu',serif;font-size:15px;color:var(--green);margin-left:8px;direction:rtl;display:inline-block}
+/* FORMS */
+.fg{margin-bottom:1.1rem}
+.fg label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:5px}
+.ur-lbl{font-family:'Noto Nastaliq Urdu',serif;font-size:12px;color:var(--green);margin-right:5px;direction:rtl;display:inline-block}
+input[type=text],input[type=number],select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);background:var(--white);transition:border-color .2s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(29,158,117,.1)}
+textarea{resize:vertical}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+/* BUTTON */
+.btn-primary{background:var(--green);color:white;border:none;padding:12px 26px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .2s,transform .1s;margin-top:4px}
+.btn-primary:hover{background:var(--green-dark)}
+.btn-primary:active{transform:scale(.98)}
+.btn-primary:disabled{background:var(--green-mid);cursor:not-allowed}
+/* RESULT */
+.result-box{margin-top:1.4rem;background:var(--white);border:1.5px solid var(--green-mid);border-radius:12px;padding:1.2rem;line-height:1.8;font-size:14px;display:none}
+.result-box.show{display:block}
+.loading{display:flex;align-items:center;gap:12px;color:var(--green-dark);font-size:14px}
+.spinner{width:20px;height:20px;border:2.5px solid var(--green-light);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-msg{background:var(--red-bg);color:var(--red);padding:12px 16px;border-radius:8px;font-size:13px;border:1px solid #F09595}
+.answer{white-space:pre-wrap;line-height:1.9}
+/* FOOTER */
+.footer{text-align:center;padding:1.5rem 1rem;color:var(--muted);font-size:12px;border-top:1px solid var(--border);background:var(--white)}
+.ur-footer{font-family:'Noto Nastaliq Urdu',serif;direction:rtl;font-size:12px;color:var(--muted);margin-top:5px}
+@media(max-width:600px){
+  .header-inner{flex-direction:column;align-items:flex-start}
+  .tab{min-width:80px;font-size:11px;padding:11px 3px}
+  .main{padding:1rem .75rem}
+  .input-row{grid-template-columns:1fr}
+  .btn-primary{width:100%;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">🌾</span>
+      <div>
+        <span class="logo-en">AgriSmart</span>
+        <span class="logo-ur">زرعی مشیر</span>
+      </div>
+    </div>
+    <p class="tagline">Your smart farming partner 🇵🇰</p>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" onclick="switchTab('doctor',this)"><span class="tab-icon">🩺</span>Crop Doctor</button>
+  <button class="tab" onclick="switchTab('planting',this)"><span class="tab-icon">📅</span>Planting Guide</button>
+  <button class="tab" onclick="switchTab('fertilizer',this)"><span class="tab-icon">💧</span>Fertilizer & Water</button>
+  <button class="tab" onclick="switchTab('market',this)"><span class="tab-icon">📈</span>Market Prices</button>
+</nav>
+
+<main class="main">
+
+  <!-- CROP DOCTOR -->
+  <section id="tab-doctor" class="tab-content active">
+    <div class="sec-head">
+      <h2>Crop Doctor <span class="ur-inline">فصل ڈاکٹر</span></h2>
+      <p>Describe your crop problem — get expert diagnosis and treatment in Urdu & English</p>
+    </div>
+    <div class="fg">
+      <label>Crop Name <span class="ur-lbl">فصل کا نام</span></label>
+      <input type="text" id="doc-crop" placeholder="e.g. Wheat, Rice, Cotton, Sugarcane..."/>
+    </div>
+    <div class="fg">
+      <label>Describe the Problem <span class="ur-lbl">مسئلہ بیان کریں</span></label>
+      <textarea id="doc-problem" rows="4" placeholder="e.g. Yellow spots on leaves, wilting, insects... آپ اردو میں بھی لکھ سکتے ہیں"></textarea>
+    </div>
+    <div class="fg">
+      <label>Province <span class="ur-lbl">صوبہ</span></label>
+      <select id="doc-location">
+        <option value="">Select province...</option>
+        <option>Punjab</option><option>Sindh</option><option>KPK</option>
+        <option>Balochistan</option><option>Azad Kashmir</option><option>Gilgit-Baltistan</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="doc-btn" onclick="runCropDoctor()">🔍 Diagnose My Crop</button>
+    <div class="result-box" id="doc-result"></div>
+  </section>
+
+  <!-- PLANTING GUIDE -->
+  <section id="tab-planting" class="tab-content">
+    <div class="sec-head">
+      <h2>Planting Guide <span class="ur-inline">کاشت گائیڈ</span></h2>
+      <p>Get a full seasonal care calendar for your crop</p>
+    </div>
+    <div class="fg">
+      <label>Crop <span class="ur-lbl">فصل</span></label>
+      <select id="plant-crop">
+        <option value="">Select crop...</option>
+        <option>Wheat (گندم)</option><option>Rice (چاول)</option><option>Cotton (کپاس)</option>
+        <option>Sugarcane (گنا)</option><option>Maize (مکئی)</option><option>Potato (آلو)</option>
+        <option>Onion (پیاز)</option><option>Tomato (ٹماٹر)</option><option>Mango (آم)</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Current Month <span class="ur-lbl">مہینہ</span></label>
+      <select id="plant-month">
+        <option>January</option><option>February</option><option>March</option><option>April</option>
+        <option>May</option><option>June</option><option>July</option><option>August</option>
+        <option>September</option><option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>City <span class="ur-lbl">شہر</span></label>
+      <input type="text" id="plant-city" placeholder="e.g. Lahore, Multan, Faisalabad..."/>
+    </div>
+    <button class="btn-primary" id="plant-btn" onclick="runPlantingGuide()">📋 Get Planting Calendar</button>
+    <div class="result-box" id="plant-result"></div>
+  </section>
+
+  <!-- FERTILIZER -->
+  <section id="tab-fertilizer" class="tab-content">
+    <div class="sec-head">
+      <h2>Fertilizer & Water <span class="ur-inline">کھاد اور پانی</span></h2>
+      <p>Get exact fertilizer doses and irrigation schedule for your land</p>
+    </div>
+    <div class="fg">
+      <label>Crop <span class="ur-lbl">فصل</span></label>
+      <input type="text" id="fert-crop" placeholder="e.g. Wheat, Rice, Cotton..."/>
+    </div>
+    <div class="fg">
+      <label>Land Size <span class="ur-lbl">رقبہ</span></label>
+      <div class="input-row">
+        <input type="number" id="fert-acres" placeholder="e.g. 2" min="0.5" step="0.5"/>
+        <select id="fert-unit"><option>Acres</option><option>Kanal</option><option>Marla</option></select>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Soil Type <span class="ur-lbl">مٹی</span></label>
+      <select id="fert-soil">
+        <option value="">Select soil type...</option>
+        <option>Clay (چکنی مٹی)</option><option>Sandy (ریتلی مٹی)</option>
+        <option>Loamy (دوغلی مٹی)</option><option>Not sure</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Water Source <span class="ur-lbl">پانی</span></label>
+      <select id="fert-water">
+        <option>Canal (نہر)</option><option>Tubewell (ٹیوب ویل)</option>
+        <option>Rain-fed (بارانی)</option><option>Both canal and tubewell</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="fert-btn" onclick="runFertilizer()">📊 Get My Schedule</button>
+    <div class="result-box" id="fert-result"></div>
+  </section>
+
+  <!-- MARKET -->
+  <section id="tab-market" class="tab-content">
+    <div class="sec-head">
+      <h2>Market Prices <span class="ur-inline">منڈی بھاؤ</span></h2>
+      <p>Ask about crop prices, best time to sell, and mandi rates</p>
+    </div>
+    <div class="fg">
+      <label>Your Crop <span class="ur-lbl">فصل</span></label>
+      <input type="text" id="mkt-crop" placeholder="e.g. Wheat, Cotton, Rice..."/>
+    </div>
+    <div class="fg">
+      <label>Your Question <span class="ur-lbl">سوال</span></label>
+      <textarea id="mkt-question" rows="3" placeholder="e.g. What is the current price of wheat? When should I sell cotton? اردو میں بھی پوچھ سکتے ہیں"></textarea>
+    </div>
+    <div class="fg">
+      <label>Province <span class="ur-lbl">صوبہ</span></label>
+      <select id="mkt-province">
+        <option value="">Select province...</option>
+        <option>Punjab</option><option>Sindh</option><option>KPK</option><option>Balochistan</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="mkt-btn" onclick="runMarket()">💰 Get Market Info</button>
+    <div class="result-box" id="mkt-result"></div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <p>AgriSmart — Built for Pakistani Farmers 🇵🇰 | HEC Generative AI Hackathon 2026</p>
+  <p class="ur-footer">یہ معلومات صرف رہنمائی کے لیے ہیں — سنگین مسئلے میں زرعی ماہر سے رابطہ کریں</p>
+</footer>
+
+<script>
+const API_KEY = "AIzaSyBGGTgKtbbagL1AcL0pymJD8ZEDdrxvpcs";
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+function switchTab(name, el) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(s => s.classList.remove("active"));
+  document.getElementById("tab-" + name).classList.add("active");
+  el.classList.add("active");
+}
+
+async function askGemini(prompt) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      contents: [{parts: [{text: prompt}]}],
+      generationConfig: {temperature: 0.7, maxOutputTokens: 1000}
+    })
+  });
+  if (!res.ok) {
+    const e = await res.json();
+    throw new Error(e.error?.message || "API error " + res.status);
+  }
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+}
+
+function loading(id) {
+  const b = document.getElementById(id);
+  b.className = "result-box show";
+  b.innerHTML = '<div class="loading"><div class="spinner"></div><span>AgriSmart is thinking... زرعی مشیر سوچ رہا ہے</span></div>';
+}
+
+function showResult(id, text) {
+  const b = document.getElementById(id);
+  b.className = "result-box show";
+  const html = text.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/\n/g,"<br>");
+  b.innerHTML = `<div class="answer">${html}</div>`;
+}
+
+function showError(id, msg) {
+  const b = document.getElementById(id);
+  b.className = "result-box show";
+  b.innerHTML = `<div class="error-msg"><strong>Error:</strong> ${msg}</div>`;
+}
+
+async function runCropDoctor() {
+  const crop = document.getElementById("doc-crop").value.trim();
+  const problem = document.getElementById("doc-problem").value.trim();
+  const loc = document.getElementById("doc-location").value || "Pakistan";
+  if (!crop || !problem) { alert("Please enter crop name and describe the problem."); return; }
+
+  const btn = document.getElementById("doc-btn");
+  btn.disabled = true;
+  loading("doc-result");
+
+  const prompt = `You are AgriSmart, an expert agricultural advisor for Pakistani farmers.
+
+A farmer from ${loc} has this problem:
+Crop: ${crop}
+Problem: ${problem}
+
+Please respond in BOTH Urdu and English with these sections:
+
+**اردو جواب:**
+تشخیص (Diagnosis in Urdu):
+علاج (Treatment in Urdu - with specific product names available in Pakistan):
+احتیاط (Prevention in Urdu):
+
+**English Answer:**
+Diagnosis:
+Treatment (with exact product names, quantities, available in Pakistani markets):
+Prevention tips:
+
+Be specific with dosages and product names. Keep it practical for small farmers.`;
+
+  try {
+    const r = await askGemini(prompt);
+    showResult("doc-result", r);
+  } catch(e) {
+    showError("doc-result", e.message);
+  }
+  btn.disabled = false;
+}
+
+async function runPlantingGuide() {
+  const crop = document.getElementById("plant-crop").value;
+  const month = document.getElementById("plant-month").value;
+  const city = document.getElementById("plant-city").value.trim() || "Punjab";
+  if (!crop) { alert("Please select a crop."); return; }
+
+  const btn = document.getElementById("plant-btn");
+  btn.disabled = true;
+  loading("plant-result");
+
+  const prompt = `You are AgriSmart, a Pakistani agricultural expert.
+
+Give a complete planting and care guide in BOTH Urdu and English:
+Crop: ${crop}
+Month: ${month}
+Location: ${city}, Pakistan
+
+Include:
+**اردو گائیڈ:**
+- بوائی کا وقت
+- زمین کی تیاری
+- کھاد
+- آبپاشی
+- بیماریوں سے بچاؤ
+- کٹائی کا وقت اور متوقع پیداوار
+
+**English Guide:**
+- Sowing time
+- Land preparation
+- Fertilizer schedule
+- Irrigation
+- Disease prevention
+- Harvest time and expected yield per acre`;
+
+  try {
+    const r = await askGemini(prompt);
+    showResult("plant-result", r);
+  } catch(e) {
+    showError("plant-result", e.message);
+  }
+  btn.disabled = false;
+}
+
+async function runFertilizer() {
+  const crop = document.getElementById("fert-crop").value.trim();
+  const acres = document.getElementById("fert-acres").value;
+  const unit = document.getElementById("fert-unit").value;
+  const soil = document.getElementById("fert-soil").value || "loamy";
+  const water = document.getElementById("fert-water").value;
+  if (!crop || !acres) { alert("Please enter crop name and land size."); return; }
+
+  const btn = document.getElementById("fert-btn");
+  btn.disabled = true;
+  loading("fert-result");
+
+  const prompt = `You are AgriSmart, an expert agronomist for Pakistani farmers.
+
+Give a detailed fertilizer and irrigation schedule in BOTH Urdu and English:
+Crop: ${crop}
+Land: ${acres} ${unit}
+Soil: ${soil}
+Water source: ${water}
+
+**اردو شیڈول:**
+- کھاد کی اقسام اور مقدار (DAP, Urea, SOP وغیرہ)
+- کھاد ڈالنے کا وقت
+- آبپاشی کا شیڈول
+- تخمینہ لاگت (روپے میں)
+
+**English Schedule:**
+- Fertilizer types and exact quantities in bags per acre
+- When to apply each fertilizer
+- Irrigation schedule (how many times, interval in days)
+- Estimated cost in Pakistani Rupees`;
+
+  try {
+    const r = await askGemini(prompt);
+    showResult("fert-result", r);
+  } catch(e) {
+    showError("fert-result", e.message);
+  }
+  btn.disabled = false;
+}
+
+async function runMarket() {
+  const crop = document.getElementById("mkt-crop").value.trim();
+  const question = document.getElementById("mkt-question").value.trim();
+  const province = document.getElementById("mkt-province").value || "Pakistan";
+  if (!crop || !question) { alert("Please enter your crop and question."); return; }
+
+  const btn = document.getElementById("mkt-btn");
+  btn.disabled = true;
+  loading("mkt-result");
+
+  const prompt = `You are AgriSmart, a Pakistani agricultural market expert.
+
+Answer this farmer's question in BOTH Urdu and English:
+Crop: ${crop}
+Province: ${province}
+Question: ${question}
+
+**اردو جواب:**
+(مارکیٹ قیمت، بیچنے کا بہترین وقت، اور فائدہ مند مشورہ)
+
+**English Answer:**
+(Market price guidance, best time to sell, tips to get better prices, government support price if applicable, which mandis offer better rates)
+
+Note: Give approximate current market rates in PKR and practical advice.`;
+
+  try {
+    const r = await askGemini(prompt);
+    showResult("mkt-result", r);
+  } catch(e) {
+    showError("mkt-result", e.message);
+  }
+  btn.disabled = false;
+}
+</script>
+</body>
+</html>
