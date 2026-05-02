@@ -288,7 +288,7 @@
   <div id="fertilizer-error" class="hidden mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm"></div>
   <div id="fertilizer-result" class="hidden mt-6 result-box fade-in">
     <div class="flex justify-between items-start mb-3">
-      <h3 class="font-bold text-dark-green text-lg">�� Fertilizer & Irrigation Plan</h3>
+      <h3 class="font-bold text-dark-green text-lg">   Fertilizer & Irrigation Plan</h3>
       <button onclick="readAloud(document.getElementById('fertilizer-result-text').innerText)" class="read-btn bg-primary text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-dark-green flex items-center gap-1">🔊 Read Aloud</button>
       <button onclick="stopReading()" class="stop-btn hidden bg-red-500 text-white px-3 py-1 rounded-lg text-sm font-medium hover:bg-red-700 flex items-center gap-1">⏹ Stop</button>
     </div>
@@ -337,7 +337,7 @@
       <div id="w-humidity" class="text-xl font-bold text-dark-green">--</div>
     </div>
     <div class="weather-card text-center">
-      <div class="text-2xl mb-1">��️</div>
+      <div class="text-2xl mb-1">  ️</div>
       <div class="text-xs text-gray-500 font-medium">Rain Chance</div>
       <div id="w-rain" class="text-xl font-bold text-dark-green">--</div>
     </div>
@@ -688,6 +688,9 @@ async function diagnose() {
   try {
     let result;
     const prompt = `You are AgriSmart, an expert agricultural AI for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
+
+
 Crop: ${cropName || 'Unknown'}
 Province: ${province || 'Pakistan'}
 Problem Description: ${problem || 'Visual inspection only'}
@@ -735,6 +738,7 @@ async function getPlantingGuide() {
 
   try {
     const prompt = `You are AgriSmart, an expert agricultural advisor for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
 
 Provide a comprehensive PLANTING GUIDE for:
 - Crop: ${crop}
@@ -780,6 +784,7 @@ async function getFertilizerAdvice() {
 
   try {
     const prompt = `You are AgriSmart, an expert agricultural advisor for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
 
 Provide FERTILIZER & IRRIGATION advice for:
 - Crop: ${crop}
@@ -859,7 +864,10 @@ Rain Probability: ${rainChance}% (Total expected: ${totalRain}mm in next 24h)
 Wind Speed: ${avgWind} m/s`;
 
     // Step 5: Send to AI for farming advice
-    const prompt = `You are AgriSmart, an AI agricultural advisor for Pakistani farmers. Based on this weather forecast for ${city}:
+    const prompt = `You are AgriSmart, an AI agricultural advisor for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
+
+Based on this weather forecast for ${city}:
 
 ${weatherSummary}
 
@@ -922,7 +930,10 @@ async function getMarketForecast() {
 
   try {
     const data = MARKET_DATA[crop];
-    const prompt = `You are AgriSmart Market Analyst for Pakistani farmers. Using this real market data for ${crop} in ${province || 'Pakistan'}:
+    const prompt = `You are AgriSmart Market Analyst for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
+
+ Using this real market data for ${crop} in ${province || 'Pakistan'}:
 
 Current Price: PKR ${data.current} ${data.unit}
 Trend: ${data.trend}
@@ -983,7 +994,10 @@ function startGlobalVoice() {
     document.getElementById('voice-modal-result').classList.add('hidden');
 
     try {
-      const prompt = `You are AgriSmart voice assistant for Pakistani farmers. Answer this farming question briefly and practically in both Urdu and English:
+      const prompt = `You are AgriSmart voice assistant for Pakistani farmers.
+IMPORTANT FORMATTING RULE: Do NOT use any markdown formatting. No asterisks, no bold, no bullet symbols, no hashtags, no dashes for lists. Write in plain text only. Use numbered lists like 1. 2. 3. and write section titles in CAPITAL LETTERS followed by a colon.
+
+ Answer this farming question briefly and practically in both Urdu and English:
 
 Question: ${query}
 
@@ -1020,10 +1034,27 @@ function showLoading(tab) {
 function hideLoading(tab) {
   document.getElementById(tab + '-loading').classList.add('hidden');
 }
+function stripMarkdown(text) {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')   // **bold**
+    .replace(/\*([^*]+)\*/g, '$1')         // *italic*
+    .replace(/_{2}([^_]+)_{2}/g, '$1')      // __bold__
+    .replace(/_([^_]+)_/g, '$1')            // _italic_
+    .replace(/#{1,6}\s?/g, '')             // ### headings
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')     // `code`
+    .replace(/^\s*[-*+]\s+/gm, '')        // bullet points
+    .replace(/^\s*\d+\.\s+/gm, (m) => m) // keep numbered lists
+    .replace(/>{1,}\s?/g, '')              // blockquotes
+    .replace(/~{2}([^~]+)~{2}/g, '$1')     // ~~strikethrough~~
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [links](url)
+    .replace(/\n{3,}/g, '\n\n')          // excessive newlines
+    .trim();
+}
+
 function showResult(tab, text) {
   const resultEl = document.getElementById(tab + '-result');
   const textEl = document.getElementById(tab + '-result-text');
-  textEl.textContent = text;
+  textEl.textContent = stripMarkdown(text);
   resultEl.classList.remove('hidden');
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
