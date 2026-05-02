@@ -32,7 +32,7 @@ exports.handler = async (event) => {
         "X-Title": "AgriSmart"
       },
       body: JSON.stringify({
-        model: "google/gemma-4-26b-a4b-it:free",
+        model: "google/gemma-4-31b-it:free",
         messages: [{ role: "user", content: messageContent }],
         temperature: 0.7,
         max_tokens: 1200
